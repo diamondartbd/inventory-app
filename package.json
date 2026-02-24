@@ -1,0 +1,38 @@
+{
+  "name": "diamond-art-inventory",
+  "version": "1.0.0",
+  "description": "Diamond Art Inventory Software",
+  "main": "main.js",
+  "author": "Diamond Art",
+  "license": "ISC",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder"
+  },
+  "devDependencies": {
+    "electron": "^39.2.6",
+    "electron-builder": "^25.1.8"
+  },
+  "dependencies": {
+    "better-sqlite3": "^12.5.0",
+    "fs-extra": "^11.3.2"
+  },
+  "build": {
+    "appId": "com.diamondart.inventory",
+    "productName": "Diamond Art Inventory",
+    "directories": {
+      "output": "dist"
+    },
+    "win": {
+      "target": "nsis",
+      "icon": "assets/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Diamond Art Inventory"
+    }
+  }
+}

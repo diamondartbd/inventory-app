@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' data: file:; style-src 'self' 'unsafe-inline'; img-src 'self' data: file:; script-src 'self';" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Diamond Art Inventory</title>
+
+  <style>
+    :root{
+      --bg:#0b1220;
+      --card:#0f172a;
+      --card2:#111a2e;
+      --text:#e5e7eb;
+      --muted:#9ca3af;
+      --border:rgba(255,255,255,.10);
+      --accent:#5eead4;
+      --danger:#fb7185;
+      --primary:#60a5fa;
+      --shadow: 0 12px 35px rgba(0,0,0,.35);
+      --radius:18px;
+
+      /* ✅ Brand color */
+      --brandRed:#ef4444; /* red */
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background: radial-gradient(1200px 600px at 20% 0%, rgba(96,165,250,.15), transparent 60%),
+                  radial-gradient(900px 500px at 100% 20%, rgba(94,234,212,.12), transparent 60%),
+                  var(--bg);
+      color:var(--text);
+    }
+
+    .topbar{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding:16px 18px;
+      position:sticky;
+      top:0;
+      z-index:50;
+      backdrop-filter: blur(10px);
+      background: rgba(11,18,32,.70);
+      border-bottom:1px solid var(--border);
+    }
+    .brand{
+      display:flex;
+      gap:12px;
+      align-items:center;
+    }
+    .logo{
+      width:44px;height:44px;border-radius:14px;
+      display:flex;align-items:center;justify-content:center;
+      background: rgba(255,255,255,.04);
+      border:1px solid var(--border);
+      overflow:hidden;
+    }
+    .logo img{width:100%;height:100%;object-fit:cover}
+    .title h1{margin:0;font-size:16px;letter-spacing:.6px}
+    .title p{margin:2px 0 0;color:var(--muted);font-size:12px}
+
+    /* ✅ Brand text styling */
+    .brandWordDiamond{color:var(--text); font-weight:900;}
+    .brandWordArt{color:var(--brandRed); font-weight:900;}
+    .brandTagline{
+      margin-top:4px !important;
+      font-size:12px !important;
+      color:var(--text) !important;
+      font-style: italic;
+      letter-spacing:.3px;
+      font-family: "Segoe Script","Brush Script MT","Comic Sans MS",cursive;
+      opacity:.95;
+    }
+
+    .container{
+      display:grid;
+      grid-template-columns: 270px 1fr;
+      gap:14px;
+      padding:14px;
+    }
+
+    .card{
+      background: rgba(15,23,42,.78);
+      border:1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .cardHeader{
+      padding:14px 14px 12px;
+      border-bottom:1px solid var(--border);
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:12px;
+    }
+    .cardHeader h2{
+      margin:0;
+      font-size:14px;
+      letter-spacing:.4px;
+    }
+    .cardHeader .muted{font-size:12px;color:var(--muted)}
+    .cardBody{padding:14px}
+
+    .row{display:flex;align-items:center;gap:10px}
+    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+    .grid4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px}
+    label{display:block;margin-bottom:6px;font-size:12px;color:var(--muted)}
+
+    input, select, textarea{
+      width:100%;
+      padding:10px 12px;
+      background: rgba(255,255,255,.04);
+      border:1px solid var(--border);
+      border-radius: 14px;
+      color:var(--text);
+      outline:none;
+    }
+    textarea{resize:vertical}
+    input:focus, select:focus, textarea:focus{
+      border-color: rgba(94,234,212,.45);
+      box-shadow: 0 0 0 4px rgba(94,234,212,.10);
+    }
+
+    /* ✅ Dropdown theme fix (no white) */
+    select{
+      background: rgba(255,255,255,.04);
+      color: var(--text);
+    }
+    select option{
+      background: rgba(17,26,46,.98);
+      color: var(--text);
+    }
+
+    .btn{
+      padding:10px 12px;
+      border-radius: 14px;
+      border:1px solid var(--border);
+      background: rgba(255,255,255,.04);
+      color:var(--text);
+      cursor:pointer;
+      font-weight:700;
+      letter-spacing:.2px;
+      transition: .15s ease;
+      user-select:none;
+    }
+    .btn:hover{transform: translateY(-1px); background: rgba(255,255,255,.06)}
+    .btn:active{transform: translateY(0px)}
+    .btn.small{padding:7px 10px;border-radius:12px;font-size:12px}
+    .btn.primary{background: rgba(96,165,250,.18); border-color: rgba(96,165,250,.35)}
+    .btn.blue{background: rgba(94,234,212,.14); border-color: rgba(94,234,212,.35)}
+    .btn.danger{background: rgba(251,113,133,.15); border-color: rgba(251,113,133,.35)}
+    .btn.navBtn{width:100%;justify-content:flex-start;display:flex}
+    .btn.navBtn.active{border-color: rgba(94,234,212,.45); background: rgba(94,234,212,.10)}
+
+    .muted{color:var(--muted);font-size:12px}
+    .kv{display:grid;grid-template-columns:180px 1fr;gap:10px;font-size:13px}
+    .kv div:nth-child(odd){color:var(--muted)}
+    .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+
+    .modalBackdrop{
+      position:fixed;inset:0;background:rgba(0,0,0,.55);
+      display:none;align-items:center;justify-content:center;
+      padding:12px;
+      z-index:1000;
+      overflow:auto;
+    }
+    .modalBackdrop.show{display:flex}
+    .modal{
+      width:min(980px,100%);
+      background:rgba(17,26,46,.96);
+      border:1px solid var(--border);
+      border-radius:18px;
+      box-shadow:var(--shadow);
+      overflow:hidden;
+      max-height: calc(100vh - 24px);
+      display:flex;
+      flex-direction:column;
+    }
+    .modalHeader{
+      padding:14px;border-bottom:1px solid var(--border);
+      display:flex;justify-content:space-between;align-items:center;gap:10px;
+      flex:0 0 auto;
+    }
+    .modalHeader h3{margin:0;font-size:14px}
+    .modalBody{
+      padding:14px;
+      flex:1 1 auto;
+      overflow:auto;
+    }
+    .modalFooter{
+      padding:14px;border-top:1px solid var(--border);
+      display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap;
+      flex:0 0 auto;
+      background:rgba(17,26,46,.98);
+    }
+
+    .toast{
+      position:fixed;right:18px;bottom:18px;background:rgba(17,26,46,.92);
+      border:1px solid var(--border);border-radius:14px;padding:10px 12px;box-shadow:var(--shadow);
+      display:none;min-width:220px; z-index:1100;
+    }
+    .toast.show{display:block}
+
+    .pill{display:inline-block;padding:4px 10px;border-radius:999px;border:1px solid var(--border);background:rgba(255,255,255,.04);font-size:12px}
+    .badge{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border-radius:999px;font-size:12px;border:1px solid var(--border);background:rgba(255,255,255,.03)}
+    .badge.in{border-color: rgba(94,234,212,.35); color: var(--accent)}
+    .badge.out{border-color: rgba(251,113,133,.35); color: var(--danger)}
+
+    .tableWrap{overflow:auto;border:1px solid var(--border);border-radius:14px}
+    table{width:100%;border-collapse:collapse;min-width:980px}
+    th, td{padding:10px 10px;border-bottom:1px solid var(--border);text-align:left;font-size:13px; vertical-align:top}
+    th{
+      position:sticky; top:0;
+      background:rgba(17,26,46,.98);
+      z-index:2;
+      color:var(--muted);
+      font-weight:700
+    }
+    tr:hover td{background:rgba(255,255,255,.03)}
+    .rightBtns{display:flex;gap:8px;flex-wrap:wrap}
+    .pager{display:flex;gap:8px;align-items:center;justify-content:flex-end;margin-top:10px}
+    .divider{height:1px;background:rgba(255,255,255,.10);margin:12px 0}
+
+    .radioRow{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+    .radioItem{display:flex;gap:8px;align-items:center;padding:8px 10px;border:1px solid var(--border);border-radius:12px;background:rgba(255,255,255,.03)}
+    .radioItem input{width:auto}
+    .subCard{border:1px solid var(--border);border-radius:14px;padding:12px;background:rgba(255,255,255,.03)}
+
+    .flashRow td{
+      background: rgba(94,234,212,.10) !important;
+      border-bottom-color: rgba(94,234,212,.35) !important;
+    }
+
+    /* =========================================================
+       ✅ Details Layout: left image, right details
+       ========================================================= */
+    .detailsGrid{
+      display:grid;
+      grid-template-columns: 360px 1fr;
+      gap:12px;
+      align-items:start;
+    }
+    .detailsImgBox{
+      border:1px solid var(--border);
+      border-radius:14px;
+      background:rgba(255,255,255,.03);
+      overflow:hidden;
+    }
+    .detailsImgTop{
+      padding:10px;
+      border-bottom:1px solid var(--border);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+    }
+    .detailsImgArea{
+      padding:10px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      min-height: 320px;
+      background:rgba(0,0,0,.08);
+    }
+    #detailsImgPreview{
+      max-width:100%;
+      max-height: 520px;
+      border-radius:12px;
+      display:none;
+    }
+    #detailsImgText{
+      color:var(--muted);
+      font-size:12px;
+      display:block;
+    }
+
+    .detailsRight{
+      border:1px solid var(--border);
+      border-radius:14px;
+      background:rgba(255,255,255,.03);
+      overflow:hidden;
+    }
+    .detailsRightTop{
+      padding:10px;
+      border-bottom:1px solid var(--border);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .detailsRightBody{
+      padding:12px;
+    }
+    .detailsRightFooter{
+      padding:12px;
+      border-top:1px solid var(--border);
+      background:rgba(17,26,46,.25);
+    }
+
+    @media (max-width: 980px){
+      .container{grid-template-columns:1fr}
+      table{min-width:900px}
+      .kv{grid-template-columns:140px 1fr}
+      .detailsGrid{grid-template-columns: 1fr}
+      .detailsImgArea{min-height: 240px}
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="topbar">
+    <div class="brand">
+      <div class="logo">
+        <img id="appLogoImg" src="assets/logo.png" onerror="this.style.display='none'" />
+      </div>
+      <div class="title">
+        <!-- ✅ Updated brand: DIAMOND (white) + ART (red) -->
+        <h1 id="brandName">
+          <span class="brandWordDiamond">DIAMOND</span>
+          <span class="brandWordArt">ART</span>
+        </h1>
+        <!-- ✅ Tagline only (Search line removed as requested) -->
+        <p class="brandTagline">Your Classic Partner</p>
+      </div>
+    </div>
+    <div class="row">
+      <button class="btn" id="btnChangeLogo">🖼️ Change Logo</button>
+      <button class="btn blue" id="btnOpenAdd">+ Add Product</button>
+    </div>
+  </div>
+
+  <div class="container">
+
+    <!-- LEFT NAV -->
+    <div class="card">
+      <div class="cardHeader">
+        <h2>Pages</h2>
+        <span class="muted">Navigate</span>
+      </div>
+      <div class="cardBody">
+        <button class="btn navBtn active" id="navDashboard">🏠 Dashboard</button>
+        <div style="height:10px"></div>
+        <div class="muted" style="margin-bottom:8px">Categories</div>
+        <div id="categoryNav"></div>
+      </div>
+    </div>
+
+    <!-- RIGHT CONTENT -->
+    <div>
+
+      <!-- DASHBOARD PAGE -->
+      <div class="card" id="pageDashboard">
+        <div class="cardHeader">
+          <h2>Search + Filter</h2>
+          <span class="muted">কোড লিখে Enter / অথবা Filter Apply</span>
+        </div>
+
+        <div class="cardBody">
+
+          <div class="row" style="gap:10px">
+            <input id="searchBox" placeholder="Enter product code (e.g. N0001)" />
+            <button class="btn primary" id="btnSearch">Search</button>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="grid3">
+            <div>
+              <label class="muted">Category</label>
+              <select id="filterCategory">
+                <option value="">All</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="muted">Price (৳)</label>
+              <input id="filterPrice" type="number" placeholder="যেমন 20000" />
+              <div class="muted" style="margin-top:6px" id="priceHint">20000 দিলে 15000–25000 দেখাবে</div>
+            </div>
+
+            <div style="display:flex; gap:10px; align-items:flex-end; justify-content:flex-end">
+              <button class="btn" id="btnResetFilter">Reset</button>
+              <button class="btn primary" id="btnApplyFilter">Apply</button>
+            </div>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="row" style="justify-content:space-between; align-items:flex-end; gap:10px; flex-wrap:wrap">
+            <div>
+              <div style="font-weight:800; font-size:14px">Results</div>
+              <div class="muted" id="resultListMeta">0 items</div>
+            </div>
+            <div class="pager">
+              <span class="muted" id="resultPagerText">Page 1 / 1</span>
+              <button class="btn small" id="btnResultPrev">Prev</button>
+              <button class="btn small" id="btnResultNext">Next</button>
+            </div>
+          </div>
+
+          <div class="tableWrap" style="margin-top:10px">
+            <table>
+              <thead>
+                <tr>
+                  <th style="width:160px">Code</th>
+                  <th style="width:220px">Stock</th>
+                  <th style="width:160px">Final Price</th>
+                  <th style="width:160px">Category</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="resultListBody"></tbody>
+            </table>
+          </div>
+
+          <div class="divider"></div>
+
+          <!-- ✅ Fixed SMS Replies -->
+          <div class="subCard">
+            <div class="row" style="justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap">
+              <div>
+                <div style="font-weight:900; font-size:14px">Fixed SMS for Reply</div>
+                <div class="muted">Create করে রাখলে নিচে লিস্ট হবে • Search / View / Copy / Edit / Delete</div>
+              </div>
+              <div class="row" style="gap:10px; flex-wrap:wrap">
+                <input id="smsSearchBox" placeholder="Search reply..." style="max-width:220px" />
+                <button class="btn" id="btnSmsSearch">Search</button>
+                <button class="btn blue" id="btnSmsCreate">+ Create</button>
+              </div>
+            </div>
+
+            <div class="tableWrap" style="margin-top:10px">
+              <table style="min-width:900px">
+                <thead>
+                  <tr>
+                    <th style="width:220px">Heading</th>
+                    <th>Message</th>
+                    <th style="width:260px">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="smsListBody">
+                  <tr><td colspan="3" class="muted">No saved reply yet</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- CATEGORY PAGE -->
+      <div class="card" id="pageCategory" style="display:none; margin-top:14px">
+        <div class="cardHeader">
+          <div>
+            <h2 id="catTitle">Category</h2>
+            <span class="muted">List view • Actions: Details + Copy</span>
+          </div>
+          <div class="row" style="gap:10px; flex-wrap:wrap; justify-content:flex-end">
+            <button class="btn blue" id="btnCatPriceInput">💰 Price Input</button>
+            <button class="btn blue" id="btnCatPriceUpdate">💰 Price Update</button>
+            <button class="btn" id="btnBackToDashboard">⬅ Dashboard</button>
+          </div>
+        </div>
+
+        <div class="cardBody">
+          <div class="row" style="gap:10px; margin-bottom:10px; flex-wrap:wrap">
+            <span class="pill" id="catCount">0 items</span>
+            <span class="muted" id="catHint">Price Input = rule save • Price Update = apply prices</span>
+          </div>
+
+          <div class="tableWrap">
+            <table>
+              <thead>
+                <tr>
+                  <th style="width:140px">Code</th>
+                  <th style="width:120px">GR WT:</th>
+                  <th style="width:130px">Dia WT:(R)</th>
+                  <th style="width:130px">Dia WT:(S)</th>
+                  <th style="width:120px">Color</th>
+                  <th style="width:120px">Clarity</th>
+                  <th style="width:150px">Regular Price</th>
+                  <th style="width:160px">Discount Price</th>
+                  <th style="width:190px">Stock Status</th>
+                  <th style="width:180px">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="catListBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Add/Edit Product Modal -->
+  <div class="modalBackdrop" id="modalBackdrop">
+    <div class="modal">
+      <div class="modalHeader">
+        <h3 id="modalTitle">Add / Update Product</h3>
+        <button class="btn small" id="btnCloseModal">Back</button>
+      </div>
+
+      <div class="modalBody">
+        <div class="grid3">
+          <div>
+            <label class="muted">Category *</label>
+            <select id="fCategory"></select>
+          </div>
+          <div>
+            <label class="muted">Product Code *</label>
+            <input id="fCode" placeholder="N0001 A / R0001" />
+          </div>
+          <div>
+            <label class="muted">Quantity</label>
+            <input id="fQuantity" type="number" placeholder="1" />
+          </div>
+        </div>
+
+        <div class="grid3" style="margin-top:10px;">
+          <div>
+            <label class="muted">Gross Weight (g)</label>
+            <input id="fGrossWeight" type="number" step="0.001" placeholder="3.250" />
+          </div>
+          <div>
+            <label class="muted">Diamond WT (R) (ct)</label>
+            <input id="fDiamondWRegular" type="number" step="0.001" placeholder="0.25" />
+          </div>
+          <div>
+            <label class="muted">Diamond WT (S) (ct)</label>
+            <input id="fDiamondWSolitaire" type="number" step="0.001" placeholder="0.10" />
+          </div>
+        </div>
+
+        <div class="grid3" style="margin-top:10px;">
+          <div>
+            <label class="muted">Color Stone (g)</label>
+            <input id="fColorStone" type="number" step="0.001" placeholder="0.50" />
+          </div>
+          <div>
+            <label class="muted">Color</label>
+            <input id="fDiamondColor" placeholder="D / E / F" />
+          </div>
+          <div>
+            <label class="muted">Clarity</label>
+            <input id="fDiamondClarity" placeholder="VVS / VS" />
+          </div>
+        </div>
+
+        <div class="grid3" style="margin-top:10px;">
+          <div>
+            <label class="muted">Regular Price</label>
+            <input id="fRegularPrice" type="number" placeholder="95000" />
+          </div>
+          <div>
+            <label class="muted">Discount Price</label>
+            <input id="fDiscountPrice" type="number" placeholder="89000" />
+          </div>
+          <div>
+            <label class="muted">Note</label>
+            <input id="fNote" placeholder="(optional)" />
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="row" style="justify-content:space-between; gap:10px; flex-wrap:wrap">
+          <div class="row" style="gap:10px; flex-wrap:wrap">
+            <button class="btn small" id="btnPickImage">Pick Image</button>
+            <span class="muted" id="imgName">No file</span>
+          </div>
+          <div class="row" style="gap:10px; flex-wrap:wrap">
+            <button class="btn" id="btnResetForm">Reset</button>
+            <button class="btn primary" id="btnSaveProduct">Save</button>
+            <button class="btn danger" id="btnDeleteProduct" style="display:none;">Delete</button>
+          </div>
+        </div>
+
+        <div style="margin-top:10px; border:1px dashed var(--border); border-radius:14px; padding:10px; text-align:center">
+          <img id="imgPreview" style="max-width:100%; max-height:260px; display:none; border-radius:14px" />
+          <div class="muted" id="imgPreviewText">No preview</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Details Modal -->
+  <div class="modalBackdrop" id="detailsBackdrop">
+    <div class="modal">
+      <div class="modalHeader">
+        <h3 id="detailsTitle">Details</h3>
+        <button class="btn small" id="btnDetailsBack">Back</button>
+      </div>
+
+      <div class="modalBody">
+
+        <!-- ✅ New Two-Column Layout -->
+        <div class="detailsGrid">
+
+          <!-- LEFT: Image -->
+          <div class="detailsImgBox">
+            <div class="detailsImgTop">
+              <div class="muted" style="font-weight:800">Product Image</div>
+              <button class="btn small blue" id="btnDetailsChangeImage">Change Image</button>
+            </div>
+            <div class="detailsImgArea">
+              <img id="detailsImgPreview" />
+              <div class="muted" id="detailsImgText">No image</div>
+            </div>
+          </div>
+
+          <!-- RIGHT: Details + Actions -->
+          <div class="detailsRight">
+            <div class="detailsRightTop">
+              <div class="muted" style="font-weight:800">Product Details</div>
+              <div class="muted" style="font-size:12px">
+                Priority: <b>Special</b> → <b>Category</b> → Default
+              </div>
+            </div>
+
+            <div class="detailsRightBody">
+              <div class="kv" id="detailsKv"></div>
+            </div>
+
+            <div class="detailsRightFooter">
+              <div class="actions" style="margin-top:0">
+                <button class="btn primary" id="btnDetailsCopy">Copy</button>
+                <button class="btn" id="btnDetailsEdit">Edit</button>
+                <button class="btn blue" id="btnDetailsPriceUpdate">💰 Price Update</button>
+                <button class="btn danger" id="btnDetailsDelete">Delete</button>
+              </div>
+
+              <!-- ✅ Updated note block (VAT note removed) -->
+              <div class="muted" style="margin-top:10px; line-height:1.6">
+                ✅ আমাদের প্রতিষ্ঠানের সকল পণ্যের সাথে থাকছে আন্তর্জাতিক ল্যাব টেস্ট সার্টিফিকেট।<br/>
+                ✅ সারাদেশে কুরিয়ারের মাধ্যমে ক্যাশ অন ডেলিভারি (শর্ত প্রযোজ্য)।<br/>
+                ✅ অর্ডার/ডিটেইলস: ইনবক্স করুন অথবা কল/WhatsApp করুন — <b>01601623457</b>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- PRICE UPDATE MODAL -->
+  <div class="modalBackdrop" id="priceBackdrop">
+    <div class="modal" style="width:min(980px,100%)">
+      <div class="modalHeader">
+        <div>
+          <h3 id="priceModalTitle">Price Update</h3>
+          <div class="muted" id="priceModalSubtitle">Update category prices or set special price for a product</div>
+        </div>
+        <button class="btn small danger" id="btnClosePriceModal">Close</button>
+      </div>
+
+      <div class="modalBody">
+
+        <div class="subCard">
+          <div class="muted" style="margin-bottom:8px;font-weight:700">Target / Scope</div>
+          <div class="radioRow">
+            <label class="radioItem">
+              <input type="radio" name="priceScope" id="scopeCategory" />
+              <span>This Category</span>
+            </label>
+            <label class="radioItem">
+              <input type="radio" name="priceScope" id="scopeProduct" />
+              <span>This Product</span>
+            </label>
+            <label class="radioItem">
+              <input type="radio" name="priceScope" id="scopeSelected" />
+              <span>Selected Products</span>
+            </label>
+          </div>
+
+          <div class="grid2" style="margin-top:10px;">
+            <div>
+              <label class="muted">Current Category</label>
+              <input id="scopeCategoryName" placeholder="(auto)" readonly />
+            </div>
+            <div>
+              <label class="muted">Current Product Code</label>
+              <input id="scopeProductCode" placeholder="(auto)" readonly />
+            </div>
+          </div>
+
+          <div id="selectedCodesWrap" style="margin-top:10px; display:none;">
+            <label class="muted">Selected Codes (comma separated)</label>
+            <textarea id="selectedCodes" rows="2" placeholder="N0001 A, N0001 B"></textarea>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="subCard">
+          <div class="muted" style="margin-bottom:8px;font-weight:700">Mode</div>
+          <div class="radioRow">
+            <label class="radioItem">
+              <input type="radio" name="priceMode" id="modeCategoryRule" />
+              <span>Use Category Rule</span>
+            </label>
+            <label class="radioItem">
+              <input type="radio" name="priceMode" id="modeSpecialRates" />
+              <span>Special Rates (Product)</span>
+            </label>
+            <label class="radioItem">
+              <input type="radio" name="priceMode" id="modeFixedPrice" />
+              <span>Fixed Price</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="subCard" id="ratesSection" style="display:none;">
+          <div class="muted" style="margin-bottom:8px;font-weight:700">Rates</div>
+          <div class="grid4">
+            <div>
+              <label class="muted">Gold Rate (INR / gram)</label>
+              <input id="prGoldRate" type="number" step="0.01" />
+            </div>
+            <div>
+              <label class="muted">Dia Rate R (INR / ct)</label>
+              <input id="prDiaRateR" type="number" step="0.01" />
+            </div>
+            <div>
+              <label class="muted">Dia Rate S (INR / ct)</label>
+              <input id="prDiaRateS" type="number" step="0.01" />
+            </div>
+            <div>
+              <label class="muted">Making Rate (INR / gram)</label>
+              <input id="prMakingRate" type="number" step="0.01" />
+            </div>
+          </div>
+
+          <div class="grid4" style="margin-top:10px;">
+            <div>
+              <label class="muted">Color Stone Rate (INR / gram)</label>
+              <input id="prColorStoneRate" type="number" step="0.01" />
+            </div>
+            <div>
+              <label class="muted">INR → BDT Divider</label>
+              <input id="prInrDiv" type="number" step="0.01" />
+            </div>
+            <div>
+              <label class="muted">Carry %</label>
+              <input id="prCarryPct" type="number" step="0.01" />
+            </div>
+            <div>
+              <label class="muted">Profit Rate (Multiplier)</label>
+              <input id="prProfitRate" type="number" step="0.01" />
+            </div>
+          </div>
+
+          <div class="grid4" style="margin-top:10px;">
+            <div>
+              <label class="muted">Certificate Cost (BDT)</label>
+              <input id="prCertCost" type="number" />
+            </div>
+            <div>
+              <label class="muted">Discount %</label>
+              <input id="prDiscPct" type="number" step="0.01" />
+            </div>
+            <div>
+              <label class="muted">Rounding</label>
+              <select id="prRounding">
+                <option value="nearest100">Nearest 100 (50 rule)</option>
+                <option value="none">No rounding</option>
+              </select>
+            </div>
+            <div></div>
+          </div>
+        </div>
+
+        <div class="subCard" id="fixedSection" style="display:none;">
+          <div class="muted" style="margin-bottom:8px;font-weight:700">Fixed Price (Manual)</div>
+          <div class="grid2">
+            <div>
+              <label class="muted">Fixed Regular Price (BDT)</label>
+              <input id="fxRegular" type="number" />
+            </div>
+            <div>
+              <label class="muted">Fixed Discount Price (BDT)</label>
+              <input id="fxDiscount" type="number" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modalFooter">
+        <button class="btn danger" id="btnRemoveSpecialRule" style="margin-right:auto; display:none;">Remove Special Rule</button>
+        <button class="btn" id="btnPriceReset">Reset</button>
+        <button class="btn primary" id="btnPriceApply">Apply Update</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PRICE INPUT MODAL -->
+  <div class="modalBackdrop" id="priceInputBackdrop">
+    <div class="modal" style="width:min(980px,100%)">
+      <div class="modalHeader">
+        <div>
+          <h3 id="priceInputModalTitle">Price Input</h3>
+          <div class="muted" id="priceInputModalSubtitle">Save category rule</div>
+        </div>
+        <button class="btn small danger" id="btnClosePriceInputModal">Close</button>
+      </div>
+
+      <div class="modalBody">
+        <div class="subCard">
+          <div class="muted" style="margin-bottom:8px;font-weight:700">Category Rule Inputs</div>
+
+          <div class="grid4">
+            <div>
+              <label class="muted">Gold Rate (INR / gram)</label>
+              <input id="piGoldRate" type="number" step="0.01" />
+            </div>
+            <div>
+              <label class="muted">Dia Rate R (INR / ct)</label>
+              <input id="piDiaRateR" type="number" step="0.01" />
+            </div>
+            <div>
+              <label class="muted">Dia Rate S (INR / ct)</label>
+              <input id="piDiaRateS" type="number" step="0.01" />
+            </div>
+            <div>
+              <label class="muted">Making Rate (INR / gram)</label>
+              <input id="piMakingRate" type="number" step="0.01" />
+            </div>
+          </div>
+
+          <div class="grid4" style="margin-top:10px;">
+            <div>
+              <label class="muted">Color Stone Rate (INR / gram)</label>
+              <input id="piColorStoneRate" type="number" step="0.01" />
+            </div>
+            <div>
+              <label class="muted">INR → BDT Divider</label>
+              <input id="piInrDiv" type="number" step="0.01" />
+            </div>
+            <div>
+              <label class="muted">Carry %</label>
+              <input id="piCarryPct" type="number" step="0.01" />
+            </div>
+            <div>
+              <label class="muted">Profit Rate (Multiplier)</label>
+              <input id="piProfitRate" type="number" step="0.01" />
+            </div>
+          </div>
+
+          <div class="grid4" style="margin-top:10px;">
+            <div>
+              <label class="muted">Certificate Cost (BDT)</label>
+              <input id="piCertCost" type="number" />
+            </div>
+            <div>
+              <label class="muted">Discount %</label>
+              <input id="piDiscPct" type="number" step="0.01" />
+            </div>
+            <div>
+              <label class="muted">Rounding</label>
+              <select id="piRounding">
+                <option value="nearest100">Nearest 100 (50 rule)</option>
+                <option value="none">No rounding</option>
+              </select>
+            </div>
+            <div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modalFooter">
+        <button class="btn" id="btnPriceInputReset">Reset</button>
+        <button class="btn primary" id="btnPriceInputSave">Save Rule</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ✅ SMS Create/Edit Modal -->
+  <div class="modalBackdrop" id="smsBackdrop">
+    <div class="modal" style="width:min(720px,100%)">
+      <div class="modalHeader">
+        <div>
+          <h3 id="smsModalTitle">Create SMS Reply</h3>
+          <div class="muted">Heading + Message</div>
+        </div>
+        <button class="btn small danger" id="btnSmsClose">Close</button>
+      </div>
+
+      <div class="modalBody">
+        <div>
+          <label class="muted">Heading *</label>
+          <input id="smsTitle" placeholder="যেমন: Price Quote Reply" />
+        </div>
+
+        <div style="margin-top:10px">
+          <label class="muted">Message *</label>
+          <textarea id="smsBody" rows="7" placeholder="আপনার রিপ্লে লিখুন..."></textarea>
+          <div class="muted" id="smsCharCount" style="margin-top:6px">0 characters</div>
+        </div>
+      </div>
+
+      <div class="modalFooter">
+        <button class="btn danger" id="btnSmsDelete" style="margin-right:auto; display:none;">Delete</button>
+        <button class="btn" id="btnSmsReset">Reset</button>
+        <button class="btn primary" id="btnSmsSave">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ✅ SMS View Modal -->
+  <div class="modalBackdrop" id="smsViewBackdrop">
+    <div class="modal" style="width:min(720px,100%)">
+      <div class="modalHeader">
+        <div>
+          <h3 id="smsViewTitle">SMS View</h3>
+          <div class="muted">Full message</div>
+        </div>
+        <button class="btn small danger" id="btnSmsViewClose">Close</button>
+      </div>
+      <div class="modalBody">
+        <div class="subCard">
+          <div class="muted" style="margin-bottom:8px">Message</div>
+          <div id="smsViewBody" style="white-space:pre-wrap; font-size:14px; line-height:1.6"></div>
+        </div>
+      </div>
+      <div class="modalFooter">
+        <button class="btn primary" id="btnSmsViewCopy">Copy</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="renderer.js"></script>
+</body>
+</html>
